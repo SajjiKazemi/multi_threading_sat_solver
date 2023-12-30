@@ -8,6 +8,7 @@
 #include <sys/types.h>
 
 bool g_cancel;
+pthread_mutex_t g_mutex;
 struct ThreadData
 {
     MyGraph *graph;
@@ -23,7 +24,7 @@ void *cnf_sat(void *data)
 
     while (!g_cancel)
     {
-        pthread_mutex_lock(&thread_data->mutex_lock);
+        pthread_mutex_lock(&g_mutex);
         if (graph->edges.size() > 0)
         {
             graph->CnfSatVc();
@@ -32,8 +33,8 @@ void *cnf_sat(void *data)
             graph->setSize(0);
             
         }
-        pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
-        pthread_mutex_unlock(&thread_data->mutex_lock);
+        pthread_cond_wait(&thread_data->condition, &g_mutex);
+        pthread_mutex_unlock(&g_mutex);
     }
     return nullptr;
 }
@@ -45,7 +46,7 @@ void *approxCv1(void *data)
     std::string beginning = "APPROX-VC-1: ";
     while (!g_cancel)
     {
-        pthread_mutex_lock(&thread_data->mutex_lock);
+        pthread_mutex_lock(&g_mutex);
         if (graph->edges.size() > 0)
         {
             graph->approxCv1();
@@ -53,8 +54,8 @@ void *approxCv1(void *data)
             graph->resetEverything();
             graph->setSize(0);
         }
-        pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
-        pthread_mutex_unlock(&thread_data->mutex_lock);
+        pthread_cond_wait(&thread_data->condition, &g_mutex);
+        pthread_mutex_unlock(&g_mutex);
     }
     return nullptr;
 }
@@ -66,7 +67,7 @@ void *approxCv2(void *data)
     std::string beginning = "APPROX-VC-2: ";
     while (!g_cancel)
     {
-        pthread_mutex_lock(&thread_data->mutex_lock);
+        pthread_mutex_lock(&g_mutex);
         if (graph->edges.size() > 0)
         {
             graph->approxCv2();
@@ -74,8 +75,8 @@ void *approxCv2(void *data)
             graph->resetEverything();
             graph->setSize(0);
         }
-        pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
-        pthread_mutex_unlock(&thread_data->mutex_lock);
+        pthread_cond_wait(&thread_data->condition, &g_mutex);
+        pthread_mutex_unlock(&g_mutex);
     }
     return nullptr;
 }
@@ -85,7 +86,7 @@ int main(int argc, char **argv)
     ThreadData* thread_data1 = new ThreadData;
     ThreadData* thread_data2 = new ThreadData;
     ThreadData* thread_data3 = new ThreadData;
-
+    pthread_mutex_init(&g_mutex, nullptr);
     pthread_mutex_init(&thread_data1->mutex_lock, nullptr);
     pthread_cond_init(&thread_data1->condition, nullptr);
 
@@ -143,33 +144,45 @@ int main(int argc, char **argv)
             }
             else
             {
-                pthread_mutex_lock(&thread_data1->mutex_lock);
+                //pthread_mutex_lock(&thread_data1->mutex_lock);
+                pthread_mutex_lock(&g_mutex);
                 pthread_cond_signal(&thread_data1->condition);
-                pthread_mutex_unlock(&thread_data1->mutex_lock);
+                //pthread_mutex_unlock(&thread_data1->mutex_lock);
+                pthread_mutex_unlock(&g_mutex);
 
-                pthread_mutex_lock(&thread_data2->mutex_lock);
+                pthread_mutex_lock(&g_mutex);
+                //pthread_mutex_lock(&thread_data2->mutex_lock);
                 pthread_cond_signal(&thread_data2->condition);
-                pthread_mutex_unlock(&thread_data2->mutex_lock);
+                //pthread_mutex_unlock(&thread_data2->mutex_lock);
+                pthread_mutex_unlock(&g_mutex);
 
-                pthread_mutex_lock(&thread_data3->mutex_lock);
+                pthread_mutex_lock(&g_mutex);
+                //pthread_mutex_lock(&thread_data3->mutex_lock);
                 pthread_cond_signal(&thread_data3->condition);
-                pthread_mutex_unlock(&thread_data3->mutex_lock);
+                //pthread_mutex_unlock(&thread_data3->mutex_lock);
+                pthread_mutex_unlock(&g_mutex);
             }
         }
         
     }
     g_cancel = true;
-    pthread_mutex_lock(&thread_data1->mutex_lock);
+    //pthread_mutex_lock(&thread_data1->mutex_lock);
+    pthread_mutex_lock(&g_mutex);
     pthread_cond_signal(&thread_data1->condition);
-    pthread_mutex_unlock(&thread_data1->mutex_lock);
+    //pthread_mutex_unlock(&thread_data1->mutex_lock);
+    pthread_mutex_unlock(&g_mutex);
 
-    pthread_mutex_lock(&thread_data2->mutex_lock);
+    pthread_mutex_lock(&g_mutex);
+    //pthread_mutex_lock(&thread_data2->mutex_lock);
     pthread_cond_signal(&thread_data2->condition);
-    pthread_mutex_unlock(&thread_data2->mutex_lock);
+    //pthread_mutex_unlock(&thread_data2->mutex_lock);
+    pthread_mutex_unlock(&g_mutex);
 
-    pthread_mutex_lock(&thread_data3->mutex_lock);
+    pthread_mutex_lock(&g_mutex);
+    //pthread_mutex_lock(&thread_data3->mutex_lock);
     pthread_cond_signal(&thread_data3->condition);
-    pthread_mutex_unlock(&thread_data3->mutex_lock);
+    //pthread_mutex_unlock(&thread_data3->mutex_lock);
+    pthread_mutex_unlock(&g_mutex);
 
     ret = pthread_join(thread1, nullptr);
     if (ret != 0)

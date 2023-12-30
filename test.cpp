@@ -156,3 +156,39 @@ TEST_CASE("Test clearConnections method")
     CHECK(graph.getConnections(3).size() == 0);
 }
 
+TEST_CASE("Check approxCv1-TEST1")
+{
+    MyGraph graph;
+    graph.setNoVertices(5);
+    graph.edges = {{1, {1,2}}, {2, {1,3}}, {3, {1,4}}, {4, {1,5}}, {5, {2,5}}, {6, {3,4}}};
+    graph.approxCv1();
+    std::vector<int> expected = {1,2,3};
+    CHECK(graph.vertex_cover == expected);
+}
+
+TEST_CASE("Check approxCv1-TEST2")
+{
+    MyGraph graph;
+    graph.setNoVertices(5);
+    graph.edges = {{1, {3,2}}, {2, {1,3}}, {3, {3,4}}, {4, {2,5}}, {5, {4,5}}};
+    graph.approxCv1();
+    std::vector<int> expected = {3,5};
+    CHECK(graph.vertex_cover == expected);
+}
+
+TEST_CASE("Check printVertex using approxCv1 solver")
+{
+    MyGraph graph;
+    std::string line = "V 5";
+    std::string command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    line = "E {<3,2>,<3,1>,<3,4>,<2,5>,<5,4>}";
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::ostringstream output;
+    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+    graph.approxCv1();
+    graph.printVertexCover();
+    std::cout.rdbuf(oldCout);
+    CHECK(output.str() == "3 5\n");
+}

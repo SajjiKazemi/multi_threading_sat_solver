@@ -28,7 +28,7 @@ public:
     int getSize();
     void setSize(int num_vertices);
     void setEdges(std::map<int, std::pair<int,int>> edges);
-    std::vector<int> getConnections(int node);
+    std::vector<int> getConnections(int node, bool repeat_check);
     bool isConnected(int start, int end);
     void createRootTree(int start);
     bool checkTree(BFStree tree, int end);
@@ -40,15 +40,16 @@ public:
     void setTriedToSetEdges();
     bool checkNodeInEdges(int node);
     std::vector<int> getEdgesVertices();
-    void vertexCoverFirstCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
+    void CnfSatVcFirstCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
-    void vertexCoverSecondCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
+    void CnfSatVcSecondCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
-    void vertexCoverThirdCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
+    void CnfSatVcThirdCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
-    void vertexCoverFourthCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
+    void CnfSatVcFourthCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
-    void getVertexCover();
+    void CnfSatVc();
+    void approxCv1();
     void printVertexCover(bool thread=false);
 };
 

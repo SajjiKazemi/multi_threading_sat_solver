@@ -22,7 +22,7 @@ TEST_CASE("Test one case")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "1\n");
@@ -40,7 +40,7 @@ TEST_CASE("Test the HW case")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "4 5\n");
@@ -57,7 +57,7 @@ TEST_CASE("Both of the above together")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "1\n");
@@ -69,7 +69,7 @@ TEST_CASE("Both of the above together")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output2;
     std::streambuf* oldCout2 = std::cout.rdbuf(output2.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     std::cout.rdbuf(oldCout2);
     CHECK(output2.str() == "4 5\n");
@@ -86,7 +86,7 @@ TEST_CASE("A challenging one")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     graph.resetEverything();
     graph.setSize(0);
@@ -112,7 +112,7 @@ TEST_CASE("Final test case")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     graph.resetEverything();
     graph.setSize(0);
@@ -134,7 +134,7 @@ TEST_CASE("Final test case")
     line_parser::analyze_command(command, line, graph);
     std::ostringstream output3;
     std::streambuf* oldCout3 = std::cout.rdbuf(output3.rdbuf());
-    graph.getVertexCover();
+    graph.CnfSatVc();
     graph.printVertexCover();
     std::cout.rdbuf(oldCout3);
     CHECK(output3.str() == "4 5\n");

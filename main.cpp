@@ -25,7 +25,7 @@ void *cnf_sat(void *data)
         pthread_mutex_lock(&thread_data->mutex_lock);
         if (graph->edges.size() > 0)
         {
-            graph->getVertexCover();
+            graph->CnfSatVc();
             graph->printVertexCover(true);
             graph->resetEverything();
             graph->setSize(0);
@@ -47,7 +47,7 @@ void *cnf_sat2(void *data)
         pthread_mutex_lock(&thread_data->mutex_lock);
         if (graph->edges.size() > 0)
         {
-            graph->getVertexCover();
+            graph->CnfSatVc();
             graph->printVertexCover(true);
             graph->resetEverything();
             graph->setSize(0);

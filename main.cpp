@@ -19,6 +19,7 @@ void *cnf_sat(void *data)
 {
     ThreadData *thread_data = static_cast<ThreadData *>(data);
     MyGraph *graph = thread_data->graph;
+    std::string beginning = "CNF-SAT-VC: ";
 
     while (!g_cancel)
     {
@@ -26,7 +27,7 @@ void *cnf_sat(void *data)
         if (graph->edges.size() > 0)
         {
             graph->CnfSatVc();
-            graph->printVertexCover(true);
+            graph->printVertexCover(beginning, true);
             graph->resetEverything();
             graph->setSize(0);
             
@@ -41,17 +42,16 @@ void *approxCv1(void *data)
 {
     ThreadData *thread_data = static_cast<ThreadData *>(data);
     MyGraph *graph = thread_data->graph;
-
+    std::string beginning = "APPROX-VC-1: ";
     while (!g_cancel)
     {
         pthread_mutex_lock(&thread_data->mutex_lock);
         if (graph->edges.size() > 0)
         {
             graph->approxCv1();
-            graph->printVertexCover(true);
+            graph->printVertexCover(beginning, true);
             graph->resetEverything();
             graph->setSize(0);
-            std::cout << "second" << std::endl << std::flush;
         }
         pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
         pthread_mutex_unlock(&thread_data->mutex_lock);
@@ -63,17 +63,16 @@ void *approxCv2(void *data)
 {
     ThreadData *thread_data = static_cast<ThreadData *>(data);
     MyGraph *graph = thread_data->graph;
-
+    std::string beginning = "APPROX-VC-2: ";
     while (!g_cancel)
     {
         pthread_mutex_lock(&thread_data->mutex_lock);
         if (graph->edges.size() > 0)
         {
             graph->approxCv2();
-            graph->printVertexCover(true);
+            graph->printVertexCover(beginning, true);
             graph->resetEverything();
             graph->setSize(0);
-            std::cout << "third" << std::endl << std::flush;
         }
         pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
         pthread_mutex_unlock(&thread_data->mutex_lock);

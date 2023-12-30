@@ -308,8 +308,12 @@ void MyGraph::CnfSatVc()
 
 }
 
-void MyGraph::printVertexCover(bool thread)
+void MyGraph::printVertexCover(std::string beginning, bool thread)
 {
+    if (thread == true)
+    {
+        std::cout << beginning << " " << std::flush;
+    }
     for (std::vector<int>::size_type i = 0; i < this->vertex_cover.size(); i++)
     {
         if (i == this->vertex_cover.size() - 1)
@@ -329,7 +333,7 @@ void MyGraph::printVertexCover(bool thread)
         {
             if (thread == true)
             {
-                std::cout << this->vertex_cover[i] << " " << std::flush;
+                std::cout << this->vertex_cover[i] << "," << std::flush;
             }
             else
             {
@@ -363,6 +367,7 @@ void MyGraph::approxCv1()
         }
     }
     this->vertex_cover = vertex_cover;
+    std::sort(this->vertex_cover.begin(), this->vertex_cover.end());
 }
 
 void MyGraph::clearConnections(int node)
@@ -411,4 +416,5 @@ void MyGraph::approxCv2()
         }
     }
     this->vertex_cover = vertex_cover;
+    std::sort(this->vertex_cover.begin(), this->vertex_cover.end());
 }

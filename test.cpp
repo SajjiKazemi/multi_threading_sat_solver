@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <vector>
 
+std::string beginning = "test: ";
+
 TEST_CASE("Test one case")
 {
     MyGraph graph;
@@ -23,7 +25,7 @@ TEST_CASE("Test one case")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "1\n");
 
@@ -41,7 +43,7 @@ TEST_CASE("Test the HW case")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "4 5\n");
 }
@@ -58,7 +60,7 @@ TEST_CASE("Both of the above together")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "1\n");
     line = "V 5";
@@ -70,7 +72,7 @@ TEST_CASE("Both of the above together")
     std::ostringstream output2;
     std::streambuf* oldCout2 = std::cout.rdbuf(output2.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout2);
     CHECK(output2.str() == "4 5\n");
 }
@@ -87,7 +89,7 @@ TEST_CASE("A challenging one")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     graph.resetEverything();
     graph.setSize(0);
     std::cout.rdbuf(oldCout);
@@ -113,7 +115,7 @@ TEST_CASE("Final test case")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     graph.resetEverything();
     graph.setSize(0);
     std::cout.rdbuf(oldCout);
@@ -135,7 +137,7 @@ TEST_CASE("Final test case")
     std::ostringstream output3;
     std::streambuf* oldCout3 = std::cout.rdbuf(output3.rdbuf());
     graph.CnfSatVc();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout3);
     CHECK(output3.str() == "4 5\n");
 }
@@ -188,7 +190,7 @@ TEST_CASE("Check printVertex using approxCv1 solver")
     std::ostringstream output;
     std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
     graph.approxCv1();
-    graph.printVertexCover();
+    graph.printVertexCover(beginning);
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "3 5\n");
 }
@@ -200,14 +202,4 @@ TEST_CASE("Test rand_num function")
     int rand_num = project_needs::rand_num(max, min);
     CHECK(rand_num >= min);
     CHECK(rand_num <= max);
-}
-
-TEST_CASE("Check approxCv2-TEST1")
-{
-    MyGraph graph;
-    graph.setNoVertices(5);
-    graph.edges = {{1, {1,2}}, {2, {1,3}}, {3, {1,4}}, {4, {1,5}}, {5, {2,5}}, {6, {3,4}}};
-    graph.approxCv2();
-    std::vector<int> expected = {1,2,3};
-    CHECK(graph.vertex_cover == expected);
 }

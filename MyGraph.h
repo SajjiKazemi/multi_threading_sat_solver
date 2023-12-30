@@ -50,7 +50,7 @@ public:
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
     void CnfSatVc();
     void approxCv1();
-    void printVertexCover(bool thread=false);
+    void printVertexCover(std::string beginning, bool thread=false);
     void clearConnections(int node);
     void approxCv2();
 };

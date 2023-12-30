@@ -3,13 +3,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <fstream>
 #include <vector>
 #include <regex>
-// defined std::unique_ptr
 #include <memory>
-// defines Var and Lit
 #include "minisat/core/SolverTypes.h"
-// defines Solver
 #include "minisat/core/Solver.h"
 
 
@@ -139,4 +137,19 @@ namespace line_parser{
     }
     }
 
+}
+
+namespace project_needs
+{
+    int rand_num(int maximum, int minimum)
+    {
+        int random_number;
+        std::ifstream urandom("/dev/urandom", std::ios::in|std::ios::binary);
+        char my_random_char;
+        urandom.read(&my_random_char, sizeof(my_random_char));
+        random_number = static_cast<int>(static_cast<unsigned char>(my_random_char));
+        random_number = random_number % (maximum - minimum + 1) + minimum;
+        urandom.close();
+        return random_number;
+    }
 }

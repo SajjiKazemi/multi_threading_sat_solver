@@ -37,7 +37,7 @@ void *cnf_sat(void *data)
     return nullptr;
 }
 
-void *cnf_sat2(void *data)
+void *approxCv1(void *data)
 {
     ThreadData *thread_data = static_cast<ThreadData *>(data);
     MyGraph *graph = thread_data->graph;
@@ -47,7 +47,7 @@ void *cnf_sat2(void *data)
         pthread_mutex_lock(&thread_data->mutex_lock);
         if (graph->edges.size() > 0)
         {
-            graph->CnfSatVc();
+            graph->approxCv1();
             graph->printVertexCover(true);
             graph->resetEverything();
             graph->setSize(0);
@@ -75,6 +75,9 @@ int main(int argc, char **argv)
     pthread_t thread1, thread2;
 
     MyGraph graph;
+    MyGraph graph_t1;
+    MyGraph graph_t2;
+    MyGraph graph_t3;
     bool first = true;
     while (!std::cin.eof())
     {
@@ -84,8 +87,11 @@ int main(int argc, char **argv)
         line_parser::analyze_command(command, line, graph);
         if (graph.edges.size() > 0)
         {
-            thread_data1->graph = &graph;
-            thread_data2->graph = &graph;
+            graph_t1 = graph;
+            graph_t2 = graph;
+            graph_t3 = graph;
+            thread_data1->graph = &graph_t1;
+            thread_data2->graph = &graph_t2;
 
             if (first)
             {
@@ -95,7 +101,7 @@ int main(int argc, char **argv)
                     std::cout << "Error: pthread_create() failed\n";
                     exit(EXIT_FAILURE);
                 }
-                ret = pthread_create(&thread2, nullptr, cnf_sat2, static_cast<void *>(thread_data2));
+                ret = pthread_create(&thread2, nullptr, approxCv1, static_cast<void *>(thread_data2));
                 if (ret != 0)
                 {
                     std::cout << "Error: pthread_create() failed\n";

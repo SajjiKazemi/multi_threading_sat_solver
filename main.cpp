@@ -3,6 +3,9 @@
 #include "helpers.h"
 #include "MyGraph.h"
 #include <pthread.h>
+#include <ctime>
+#include <ratio>
+#include <chrono>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -14,6 +17,7 @@ struct ThreadData
     MyGraph *graph;
     pthread_mutex_t mutex_lock;
     pthread_cond_t condition;
+    clockid_t clock_id;
 };
 
 void *cnf_sat(void *data)
@@ -21,20 +25,26 @@ void *cnf_sat(void *data)
     ThreadData *thread_data = static_cast<ThreadData *>(data);
     MyGraph *graph = thread_data->graph;
     std::string beginning = "CNF-SAT-VC: ";
-
+    pthread_getcpuclockid(pthread_self(), &thread_data->clock_id);
     while (!g_cancel)
     {
-        pthread_mutex_lock(&g_mutex);
+        //pthread_cond_wait(&thread_data->condition, &g_mutex);
         if (graph->edges.size() > 0)
         {
+            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
             graph->CnfSatVc();
+            std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            pthread_mutex_lock(&g_mutex);
             graph->printVertexCover(beginning, true);
+            std::cout << "CNF-SAT-VC time: " << duration << " microseconds\n" << std::flush;
+            pthread_mutex_unlock(&g_mutex);
             graph->resetEverything();
             graph->setSize(0);
             
         }
-        pthread_cond_wait(&thread_data->condition, &g_mutex);
-        pthread_mutex_unlock(&g_mutex);
+
+
     }
     return nullptr;
 }

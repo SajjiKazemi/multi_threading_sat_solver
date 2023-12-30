@@ -11,23 +11,6 @@
 #include <algorithm>
 #include <vector>
 
-
-TEST_CASE("Successful Test Example") {
-    MyGraph graph;
-    std::string line = "V 5";
-    std::string command = line_parser::get_command(line, graph);
-    line_parser::analyze_command(command, line, graph);
-    line = "E {<1,3>,<1,2>,<1,4>,<4,3>,<2,4>}";
-    command = line_parser::get_command(line, graph);
-    line_parser::analyze_command(command, line, graph);
-    std::vector<int> edges_vertices = graph.getEdgesVertices();
-    CHECK(edges_vertices.size() == 4);
-    CHECK(edges_vertices[0] == 1);
-    CHECK(edges_vertices[1] == 2);
-    CHECK(edges_vertices[2] == 3);
-    CHECK(edges_vertices[3] == 4);
-}
-
 TEST_CASE("Test one case")
 {
     MyGraph graph;
@@ -90,5 +73,70 @@ TEST_CASE("Both of the above together")
     graph.printVertexCover();
     std::cout.rdbuf(oldCout2);
     CHECK(output2.str() == "4 5\n");
+}
+
+TEST_CASE("A challenging one")
+{
+    MyGraph graph;
+    std::string line = "V 150";
+    std::string command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    line = "E {<1,5>}";
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::ostringstream output;
+    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+    graph.getVertexCover();
+    graph.printVertexCover();
+    graph.resetEverything();
+    graph.setSize(0);
+    std::cout.rdbuf(oldCout);
+    CHECK(output.str() == "5\n");
+    line = "E {<1,5>,<5,2>,<1,4>,<4,5>,<4,3>,<2,4>}";
+    std::ostringstream output2;
+    std::streambuf* oldCout2 = std::cout.rdbuf(output2.rdbuf());
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::cout.rdbuf(oldCout2);
+    CHECK(output2.str() == "Error: no vertices defined\n");
+}
+
+TEST_CASE("Final test case")
+{
+    MyGraph graph;
+    std::string line = "V 350";
+    std::string command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    line = "E {<73,1>}";
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::ostringstream output;
+    std::streambuf* oldCout = std::cout.rdbuf(output.rdbuf());
+    graph.getVertexCover();
+    graph.printVertexCover();
+    graph.resetEverything();
+    graph.setSize(0);
+    std::cout.rdbuf(oldCout);
+    bool condition = (output.str() == "1\n" || output.str() == "73\n");
+    CHECK(condition == true);
+    line = "E {<1,5>,<5,2>,<1,4>,<4,5>,<4,3>,<2,4>}";
+    std::ostringstream output2;
+    std::streambuf* oldCout2 = std::cout.rdbuf(output2.rdbuf());
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::cout.rdbuf(oldCout2);
+    CHECK(output2.str() == "Error: no vertices defined\n");
+    line = "V 5";
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    line = "E {<1,5>,<5,2>,<1,4>,<4,5>,<4,3>,<2,4>}";
+    command = line_parser::get_command(line, graph);
+    line_parser::analyze_command(command, line, graph);
+    std::ostringstream output3;
+    std::streambuf* oldCout3 = std::cout.rdbuf(output3.rdbuf());
+    graph.getVertexCover();
+    graph.printVertexCover();
+    std::cout.rdbuf(oldCout3);
+    CHECK(output3.str() == "4 5\n");
 }
 

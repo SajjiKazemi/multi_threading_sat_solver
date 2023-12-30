@@ -26,6 +26,7 @@ public:
     MyGraph(int num_vertices);
     void setNoVertices(int num_vertices);
     int getSize();
+    void setSize(int num_vertices);
     void setEdges(std::map<int, std::pair<int,int>> edges);
     std::vector<int> getConnections(int node);
     bool isConnected(int start, int end);

@@ -23,6 +23,11 @@ int MyGraph::getSize()
     return this->num_vertices;
 }
 
+void MyGraph::setSize(int num_vertices)
+{
+    this->num_vertices = num_vertices;
+}
+
 void MyGraph::setEdges(std::map<int, std::pair<int,int>> edges)
 {
     resetEverything();
@@ -196,19 +201,6 @@ void MyGraph::setTriedToSetEdges()
     this->triedToSetEdges = true;
 }
 
-std::vector<int> MyGraph::getEdgesVertices()
-{
-    std::vector<int> edges_vertices;
-    for (auto const& x : this->edges)
-    {
-        edges_vertices.push_back(x.second.first);
-        edges_vertices.push_back(x.second.second);
-    }
-    std::sort(edges_vertices.begin(), edges_vertices.end());
-    edges_vertices.erase(std::unique(edges_vertices.begin(), edges_vertices.end()), edges_vertices.end());
-    return edges_vertices;
-}
-
 void MyGraph::vertexCoverFirstCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver)
 {
@@ -275,10 +267,8 @@ void MyGraph::vertexCoverFourthCondition(std::vector<std::vector<Minisat::Lit>> 
 void MyGraph::getVertexCover()
 {
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
-    std::vector<int> edges_vertices = getEdgesVertices();
-    int edges_vertices_num = edges_vertices.size();
-
-    for (int k = 1; k < edges_vertices_num; k++)
+    int edges_vertices_num = this->getSize();
+    for (int k = 1; k <= edges_vertices_num; k++)
         {
             std::vector<std::vector<Minisat::Lit>> literals(edges_vertices_num, std::vector<Minisat::Lit>(k));
             for (int i = 0; i < edges_vertices_num; i++)
@@ -304,7 +294,7 @@ void MyGraph::getVertexCover()
                         for (int j = 0; j < k; j++)
                         {
                             if (Minisat::toInt(solver->modelValue(literals[i][j])) == 0)
-                                this->vertex_cover.push_back(edges_vertices[i]);
+                                this->vertex_cover.push_back(i+1);
                         }
                     }
                     return;

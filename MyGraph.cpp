@@ -52,7 +52,7 @@ bool MyGraph::checkNodeInEdges(int node)
     return false;
 }
 
-std::vector<int> MyGraph::getConnections(int node)
+std::vector<int> MyGraph::getConnections(int node, bool repeat_check)
 {
     std::vector<int> connections;
     for (auto const& x : this->edges)
@@ -67,13 +67,16 @@ std::vector<int> MyGraph::getConnections(int node)
         }
     }
     std::sort(connections.begin(), connections.end());
-    connections.erase(std::unique(connections.begin(), connections.end()), connections.end());
+    if (repeat_check == true)
+        {
+            connections.erase(std::unique(connections.begin(), connections.end()), connections.end());
+        }
     return connections;
 }
 
 bool MyGraph::isConnected(int start, int end)
     {
-        std::vector<int> connections = getConnections(start);    
+        std::vector<int> connections = getConnections(start, true);    
             
         auto it = std::find(connections.begin(), connections.end(), end);
         if(it != connections.end())
@@ -88,10 +91,10 @@ bool MyGraph::isConnected(int start, int end)
 
 void MyGraph::createRootTree(int start)
 {
-    BFStree root_tree = BFStree(start, this->getConnections(start));
+    BFStree root_tree = BFStree(start, this->getConnections(start, true));
     for (std::vector<int>::size_type i = 0; i < root_tree.getChildren().size(); i++)
     {
-        root_tree.addGrandchild(BFStree(root_tree.getChildren()[i], this->getConnections(root_tree.getChildren()[i]), root_tree));            
+        root_tree.addGrandchild(BFStree(root_tree.getChildren()[i], this->getConnections(root_tree.getChildren()[i], true), root_tree));            
     }
     this->unvisited_trees.push_back(root_tree);
 }
@@ -118,7 +121,7 @@ void MyGraph::getUnvisitedTrees()
         {
             if(std::find(this->visited_nodes.begin(), this->visited_nodes.end(), this->unvisited_trees[i].getChildren()[j]) == this->visited_nodes.end())
             {
-                this->unvisited_trees.push_back(BFStree(this->unvisited_trees[i].getChildren()[j], this->getConnections(this->unvisited_trees[i].getChildren()[j]), this->unvisited_trees[i]));
+                this->unvisited_trees.push_back(BFStree(this->unvisited_trees[i].getChildren()[j], this->getConnections(this->unvisited_trees[i].getChildren()[j], true), this->unvisited_trees[i]));
             }
         }
     }
@@ -201,7 +204,7 @@ void MyGraph::setTriedToSetEdges()
     this->triedToSetEdges = true;
 }
 
-void MyGraph::vertexCoverFirstCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
+void MyGraph::CnfSatVcFirstCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver)
 {
     Minisat::vec<Minisat::Lit> first_condition_clauses;
@@ -216,7 +219,7 @@ void MyGraph::vertexCoverFirstCondition(std::vector<std::vector<Minisat::Lit>> l
     }
 }
 
-void MyGraph::vertexCoverSecondCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
+void MyGraph::CnfSatVcSecondCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver)
 {
     for (size_t m=0; m<rows_num; m++)
@@ -231,7 +234,7 @@ void MyGraph::vertexCoverSecondCondition(std::vector<std::vector<Minisat::Lit>> 
     }
 }
 
-void MyGraph::vertexCoverThirdCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
+void MyGraph::CnfSatVcThirdCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver)
 {
     for (size_t m=0; m<cols_num; m++)
@@ -246,7 +249,7 @@ void MyGraph::vertexCoverThirdCondition(std::vector<std::vector<Minisat::Lit>> l
     }
 }
 
-void MyGraph::vertexCoverFourthCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
+void MyGraph::CnfSatVcFourthCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num, 
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver)
 {
     Minisat::vec<Minisat::Lit> fourth_condition_clauses;
@@ -264,7 +267,7 @@ void MyGraph::vertexCoverFourthCondition(std::vector<std::vector<Minisat::Lit>> 
     }
 }
 
-void MyGraph::getVertexCover()
+void MyGraph::CnfSatVc()
 {
     std::unique_ptr<Minisat::Solver> solver(new Minisat::Solver());
     int edges_vertices_num = this->getSize();
@@ -281,10 +284,10 @@ void MyGraph::getVertexCover()
             int rows_num = literals.size();
             int cols_num = literals[0].size();
 
-            vertexCoverFirstCondition(literals, rows_num, cols_num, *this, solver);
-            vertexCoverSecondCondition(literals, rows_num, cols_num, *this, solver);
-            vertexCoverThirdCondition(literals, rows_num, cols_num, *this, solver);
-            vertexCoverFourthCondition(literals, rows_num, cols_num, *this, solver);
+            CnfSatVcFirstCondition(literals, rows_num, cols_num, *this, solver);
+            CnfSatVcSecondCondition(literals, rows_num, cols_num, *this, solver);
+            CnfSatVcThirdCondition(literals, rows_num, cols_num, *this, solver);
+            CnfSatVcFourthCondition(literals, rows_num, cols_num, *this, solver);
             
             bool res = solver->solve();
             if (res == true)
@@ -336,4 +339,9 @@ void MyGraph::printVertexCover(bool thread)
             }
         }
     }
+}
+
+void approxCv1()
+{
+    int i = 0; 
 }

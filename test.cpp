@@ -192,3 +192,22 @@ TEST_CASE("Check printVertex using approxCv1 solver")
     std::cout.rdbuf(oldCout);
     CHECK(output.str() == "3 5\n");
 }
+
+TEST_CASE("Test rand_num function")
+{
+    int min = 1;
+    int max = 5;
+    int rand_num = project_needs::rand_num(max, min);
+    CHECK(rand_num >= min);
+    CHECK(rand_num <= max);
+}
+
+TEST_CASE("Check approxCv2-TEST1")
+{
+    MyGraph graph;
+    graph.setNoVertices(5);
+    graph.edges = {{1, {1,2}}, {2, {1,3}}, {3, {1,4}}, {4, {1,5}}, {5, {2,5}}, {6, {3,4}}};
+    graph.approxCv2();
+    std::vector<int> expected = {1,2,3};
+    CHECK(graph.vertex_cover == expected);
+}

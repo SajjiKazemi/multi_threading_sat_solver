@@ -344,15 +344,24 @@ void MyGraph::approxCv1()
     std::vector<int> vertex_cover;
     std::vector<int> nodes_connections;
     std::vector<int> num_connections;
-    for (int i = 0; i < n; i++)
+    while (this->edges.size() > 0)
     {
-        nodes_connections = this->getConnections(i+1);
-        num_connections.push_back(nodes_connections.size());
-        nodes_connections.clear();
+        for (int i = 0; i < n; i++)
+        {
+            nodes_connections = this->getConnections(i+1);
+            num_connections.push_back(nodes_connections.size());
+            nodes_connections.clear();
+        }
+        if (!num_connections.empty())
+        {    
+            auto maximum = std::max_element(num_connections.begin(), num_connections.end());
+            int max_index = std::distance(num_connections.begin(), maximum);
+            vertex_cover.push_back(max_index+1);
+            clearConnections(max_index+1);
+            num_connections.clear();
+        }
     }
-    auto maximum = std::max_element(num_connections.begin(), num_connections.end());
-    int max_index = std::distance(num_connections.begin(), maximum);
-    vertex_cover.push_back(max_index+1);
+    this->vertex_cover = vertex_cover;
 }
 
 void MyGraph::clearConnections(int node)

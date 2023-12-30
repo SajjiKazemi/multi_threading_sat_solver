@@ -5,6 +5,7 @@
 #include "minisat/core/SolverTypes.h"
 #include "minisat/core/Solver.h"
 #include "BFStree.h"
+#include "helpers.h"
 
 // Constructor definition
 MyGraph::MyGraph()
@@ -377,4 +378,37 @@ void MyGraph::clearConnections(int node)
             ++it;
         }
     }
+}
+
+void MyGraph::approxCv2()
+{
+    int n = this->getSize();
+    std::vector<int> vertex_cover;
+    std::vector<int> nodes_connections;
+    std::vector<std::pair<int,int>> num_connections;
+    int rand_vertex;
+    while (this->edges.size() > 0)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            nodes_connections = this->getConnections(i+1);
+            num_connections.push_back(std::make_pair(i+1, nodes_connections.size()));
+            nodes_connections.clear();
+        }
+        auto it = std::remove_if(num_connections.begin(), num_connections.end(),
+                           [](const std::pair<int, int>& p) { return p.second == 0; });
+
+        //if (it != num_connections.end()) 
+        //{
+            num_connections.erase(it, num_connections.end());
+        //}
+        if (!num_connections.empty())
+        {    
+            rand_vertex = project_needs::rand_num(num_connections.size()-1, 0);
+            vertex_cover.push_back(num_connections[rand_vertex].first);
+            clearConnections(num_connections[rand_vertex].first);
+            num_connections.clear();
+        }
+    }
+    this->vertex_cover = vertex_cover;
 }

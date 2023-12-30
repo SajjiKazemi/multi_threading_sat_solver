@@ -52,6 +52,7 @@ public:
     void approxCv1();
     void printVertexCover(bool thread=false);
     void clearConnections(int node);
+    void approxCv2();
 };
 
 

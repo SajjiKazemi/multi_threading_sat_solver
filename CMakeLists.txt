@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(multi_threading_sat_solver)
 
+find_package(Threads)
 if (EXISTS "${CMAKE_SOURCE_DIR}/minisat")
   add_subdirectory(minisat)
 else()
@@ -29,6 +30,7 @@ endif()
 add_executable(main main.cpp helpers.cpp BFStree.cpp MyGraph.cpp)
 # link MiniSAT libraries
 target_link_libraries(main minisat-lib-static)
+target_link_libraries(main ${CMAKE_THREAD_LIBS_INIT})
 
 # create the executable for tests
 add_executable(test test.cpp helpers.cpp BFStree.cpp MyGraph.cpp)

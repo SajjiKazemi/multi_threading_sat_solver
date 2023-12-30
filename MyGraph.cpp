@@ -307,18 +307,33 @@ void MyGraph::getVertexCover()
 
 }
 
-void MyGraph::printVertexCover()
+void MyGraph::printVertexCover(bool thread)
 {
     for (std::vector<int>::size_type i = 0; i < this->vertex_cover.size(); i++)
     {
         if (i == this->vertex_cover.size() - 1)
         {
-            std::cout << this->vertex_cover[i] << std::endl;
-            break;
+            if (thread == true)
+            {
+                std::cout << this->vertex_cover[i] << std::endl << std::flush;
+                break;
+            }
+            else
+            {
+                std::cout << this->vertex_cover[i] << std::endl;
+                break;
+            }
         }
         else
         {
-            std::cout << this->vertex_cover[i] << " ";
+            if (thread == true)
+            {
+                std::cout << this->vertex_cover[i] << " " << std::flush;
+            }
+            else
+            {
+                std::cout << this->vertex_cover[i] << " ";
+            }
         }
     }
 }

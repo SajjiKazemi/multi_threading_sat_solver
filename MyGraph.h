@@ -49,7 +49,7 @@ public:
     void vertexCoverFourthCondition(std::vector<std::vector<Minisat::Lit>> literals, size_t rows_num, size_t cols_num,
                         MyGraph &graph, std::unique_ptr<Minisat::Solver>& solver);
     void getVertexCover();
-    void printVertexCover();
+    void printVertexCover(bool thread=false);
 };
 
 

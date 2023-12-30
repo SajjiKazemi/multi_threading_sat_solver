@@ -141,6 +141,7 @@ int main(int argc, char **argv)
                     std::cout << "Error: pthread_create() failed\n";
                     exit(EXIT_FAILURE);
                 }
+                graph.edges.clear();
             }
             else
             {
@@ -161,6 +162,7 @@ int main(int argc, char **argv)
                 pthread_cond_signal(&thread_data3->condition);
                 //pthread_mutex_unlock(&thread_data3->mutex_lock);
                 pthread_mutex_unlock(&g_mutex);
+                graph.edges.clear();
             }
         }
         

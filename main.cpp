@@ -59,10 +59,33 @@ void *approxCv1(void *data)
     return nullptr;
 }
 
+void *approxCv2(void *data)
+{
+    ThreadData *thread_data = static_cast<ThreadData *>(data);
+    MyGraph *graph = thread_data->graph;
+
+    while (!g_cancel)
+    {
+        pthread_mutex_lock(&thread_data->mutex_lock);
+        if (graph->edges.size() > 0)
+        {
+            graph->approxCv2();
+            graph->printVertexCover(true);
+            graph->resetEverything();
+            graph->setSize(0);
+            std::cout << "third" << std::endl << std::flush;
+        }
+        pthread_cond_wait(&thread_data->condition, &thread_data->mutex_lock);
+        pthread_mutex_unlock(&thread_data->mutex_lock);
+    }
+    return nullptr;
+}
+
 int main(int argc, char **argv) 
 {
     ThreadData* thread_data1 = new ThreadData;
     ThreadData* thread_data2 = new ThreadData;
+    ThreadData* thread_data3 = new ThreadData;
 
     pthread_mutex_init(&thread_data1->mutex_lock, nullptr);
     pthread_cond_init(&thread_data1->condition, nullptr);
@@ -70,9 +93,12 @@ int main(int argc, char **argv)
     pthread_mutex_init(&thread_data2->mutex_lock, nullptr);
     pthread_cond_init(&thread_data2->condition, nullptr);
 
+    pthread_mutex_init(&thread_data3->mutex_lock, nullptr);
+    pthread_cond_init(&thread_data3->condition, nullptr);
+
     g_cancel = false;
     int ret = 0;
-    pthread_t thread1, thread2;
+    pthread_t thread1, thread2, thread3;
 
     MyGraph graph;
     MyGraph graph_t1;
@@ -92,6 +118,7 @@ int main(int argc, char **argv)
             graph_t3 = graph;
             thread_data1->graph = &graph_t1;
             thread_data2->graph = &graph_t2;
+            thread_data3->graph = &graph_t3;
 
             if (first)
             {
@@ -108,6 +135,12 @@ int main(int argc, char **argv)
                     exit(EXIT_FAILURE);
                 }
                 first = false;
+                ret = pthread_create(&thread3, nullptr, approxCv2, static_cast<void *>(thread_data3));
+                if (ret != 0)
+                {
+                    std::cout << "Error: pthread_create() failed\n";
+                    exit(EXIT_FAILURE);
+                }
             }
             else
             {
@@ -118,6 +151,10 @@ int main(int argc, char **argv)
                 pthread_mutex_lock(&thread_data2->mutex_lock);
                 pthread_cond_signal(&thread_data2->condition);
                 pthread_mutex_unlock(&thread_data2->mutex_lock);
+
+                pthread_mutex_lock(&thread_data3->mutex_lock);
+                pthread_cond_signal(&thread_data3->condition);
+                pthread_mutex_unlock(&thread_data3->mutex_lock);
             }
         }
         
@@ -131,6 +168,10 @@ int main(int argc, char **argv)
     pthread_cond_signal(&thread_data2->condition);
     pthread_mutex_unlock(&thread_data2->mutex_lock);
 
+    pthread_mutex_lock(&thread_data3->mutex_lock);
+    pthread_cond_signal(&thread_data3->condition);
+    pthread_mutex_unlock(&thread_data3->mutex_lock);
+
     ret = pthread_join(thread1, nullptr);
     if (ret != 0)
     {
@@ -139,6 +180,13 @@ int main(int argc, char **argv)
     }
 
     ret = pthread_join(thread2, nullptr);
+    if (ret != 0)
+    {
+        std::cout << "Error: pthread_join() failed\n";
+        exit(EXIT_FAILURE);
+    }
+
+    ret = pthread_join(thread3, nullptr);
     if (ret != 0)
     {
         std::cout << "Error: pthread_join() failed\n";

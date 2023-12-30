@@ -140,3 +140,19 @@ TEST_CASE("Final test case")
     CHECK(output3.str() == "4 5\n");
 }
 
+TEST_CASE("Test clearConnections method")
+{
+    MyGraph graph;
+    graph.setNoVertices(5);
+    graph.edges = {{1, {2,3}}, {2, {1,3}}, {3, {1,4}}, {4, {3,5}}, {5, {4,2}}};
+    CHECK(graph.edges.size() == 5);
+    CHECK(graph.getConnections(3).size() == 3);
+    std::vector<int> expected = {1,2,5};
+    CHECK(graph.getConnections(3) == expected);
+    graph.clearConnections(3);
+    CHECK(graph.edges.size() == 2);
+    std::map<int, std::pair<int,int>> expected_edges = {{3, {1,4}}, {5, {4,2}}};
+    CHECK(graph.edges == expected_edges);
+    CHECK(graph.getConnections(3).size() == 0);
+}
+

@@ -28,7 +28,7 @@ public:
     int getSize();
     void setSize(int num_vertices);
     void setEdges(std::map<int, std::pair<int,int>> edges);
-    std::vector<int> getConnections(int node, bool repeat_check);
+    std::vector<int> getConnections(int node);
     bool isConnected(int start, int end);
     void createRootTree(int start);
     bool checkTree(BFStree tree, int end);
@@ -51,6 +51,7 @@ public:
     void CnfSatVc();
     void approxCv1();
     void printVertexCover(bool thread=false);
+    void clearConnections(int node);
 };
 
 

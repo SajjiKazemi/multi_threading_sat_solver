@@ -52,7 +52,7 @@ bool MyGraph::checkNodeInEdges(int node)
     return false;
 }
 
-std::vector<int> MyGraph::getConnections(int node, bool repeat_check)
+std::vector<int> MyGraph::getConnections(int node)
 {
     std::vector<int> connections;
     for (auto const& x : this->edges)
@@ -67,16 +67,13 @@ std::vector<int> MyGraph::getConnections(int node, bool repeat_check)
         }
     }
     std::sort(connections.begin(), connections.end());
-    if (repeat_check == true)
-        {
-            connections.erase(std::unique(connections.begin(), connections.end()), connections.end());
-        }
+    connections.erase(std::unique(connections.begin(), connections.end()), connections.end());
     return connections;
 }
 
 bool MyGraph::isConnected(int start, int end)
     {
-        std::vector<int> connections = getConnections(start, true);    
+        std::vector<int> connections = getConnections(start);    
             
         auto it = std::find(connections.begin(), connections.end(), end);
         if(it != connections.end())
@@ -91,10 +88,10 @@ bool MyGraph::isConnected(int start, int end)
 
 void MyGraph::createRootTree(int start)
 {
-    BFStree root_tree = BFStree(start, this->getConnections(start, true));
+    BFStree root_tree = BFStree(start, this->getConnections(start));
     for (std::vector<int>::size_type i = 0; i < root_tree.getChildren().size(); i++)
     {
-        root_tree.addGrandchild(BFStree(root_tree.getChildren()[i], this->getConnections(root_tree.getChildren()[i], true), root_tree));            
+        root_tree.addGrandchild(BFStree(root_tree.getChildren()[i], this->getConnections(root_tree.getChildren()[i]), root_tree));            
     }
     this->unvisited_trees.push_back(root_tree);
 }
@@ -121,7 +118,7 @@ void MyGraph::getUnvisitedTrees()
         {
             if(std::find(this->visited_nodes.begin(), this->visited_nodes.end(), this->unvisited_trees[i].getChildren()[j]) == this->visited_nodes.end())
             {
-                this->unvisited_trees.push_back(BFStree(this->unvisited_trees[i].getChildren()[j], this->getConnections(this->unvisited_trees[i].getChildren()[j], true), this->unvisited_trees[i]));
+                this->unvisited_trees.push_back(BFStree(this->unvisited_trees[i].getChildren()[j], this->getConnections(this->unvisited_trees[i].getChildren()[j]), this->unvisited_trees[i]));
             }
         }
     }
@@ -341,7 +338,34 @@ void MyGraph::printVertexCover(bool thread)
     }
 }
 
-void approxCv1()
+void MyGraph::approxCv1()
 {
-    int i = 0; 
+    int n = this->getSize();
+    std::vector<int> vertex_cover;
+    std::vector<int> nodes_connections;
+    std::vector<int> num_connections;
+    for (int i = 0; i < n; i++)
+    {
+        nodes_connections = this->getConnections(i+1);
+        num_connections.push_back(nodes_connections.size());
+        nodes_connections.clear();
+    }
+    auto maximum = std::max_element(num_connections.begin(), num_connections.end());
+    int max_index = std::distance(num_connections.begin(), maximum);
+    vertex_cover.push_back(max_index+1);
+}
+
+void MyGraph::clearConnections(int node)
+{
+    for (auto it = this->edges.begin(); it != this->edges.end();)
+    {
+        if (it->second.first == node || it->second.second == node)
+        {
+            it = this->edges.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
